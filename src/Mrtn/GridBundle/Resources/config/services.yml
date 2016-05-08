@@ -1,0 +1,9 @@
+parameters:
+    mrtn_zgrid.class: Mrtn\GridBundle\Builder\Builder
+
+services:
+    mrtn_zgrid:
+        class: %mrtn_zgrid.class%
+        arguments:
+            - @annotation_reader
+            - @property_accessor
