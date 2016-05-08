@@ -6,7 +6,7 @@
 	"keywords": ["grid", "library"],
     "require": {
         "php": ">=5.4",
-        "mikemirten/zgrid": "master-dev"
+        "mikemirten/zgrid": "dev-master"
     },
 	"autoload": {
 		"psr-0": {
