@@ -1,0 +1,16 @@
+{
+    "name": "mikemirten/zgrid-bundle",
+	"description": "zGRID symfony bundle",
+	"type": "symfony-bundle",
+    "license": "GPL-3.0",
+	"keywords": ["grid", "library"],
+    "require": {
+        "php": ">=5.4",
+        "mikemirten/zgrid": "master-dev"
+    },
+	"autoload": {
+		"psr-0": {
+			"Mrtn\\GridBundle\\": "src/"
+		}
+	}
+}

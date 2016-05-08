@@ -1,0 +1,165 @@
+<div class="panel panel-default">
+	{% if grid.title is not null %}
+	<div class="panel-heading">{{ grid.title }}</div>
+	{% endif %}
+	
+	<div class="panel-body">
+		<div class="row">
+			<div class="col-md-6">
+				{% if grid.globallySearchable %}
+				<div class="input-group">
+					<input id="zgrid_global_search" type="search" class="form-control" placeholder="Search" value="{{ grid.globalSearch }}" />
+
+					<span class="input-group-btn">
+						<button class="btn btn-default js-zgrid-param" data-definition="globalSearch.replace(query:[#zgrid_global_search])">
+							<span class="glyphicon glyphicon-search"></span>
+						</button>
+
+						{% if grid.globalSearch is not null %}
+						<button class="btn btn-default js-zgrid-param" data-definition="globalSearch.remove(query:*)">
+							<span class="glyphicon glyphicon-remove"></span>
+						</button>
+						{% endif %}
+					</span>
+				</div>
+				{% endif %}
+			</div>
+			
+			<div class="col-md-6">
+				<nav class="pull-right">
+					<div class="btn-group">
+						<button class="btn btn-default dropdown-toggle" data-toggle="dropdown">Columns <span class="caret"></span></button>
+
+						<ul class="dropdown-menu">
+							{% for col in grid.columns %}
+							<li><a href="#"><span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;{{ col.title }}</a></li>
+							{% endfor %}
+						</ul>
+					</div>
+						
+					<button class="btn btn-success"><span class="glyphicon glyphicon-refresh"></span>&nbsp;&nbsp;Refresh</button>
+				</nav>
+			</div>
+		</div>
+	</div>
+	
+	<div class="table-responsive">
+		<table class="{% block table_class %}table table-hover table-striped table-condensed table-bordered{% endblock %}">
+			<colgroup>
+				{% for col in grid.columns %}
+				<col width="{{ col.width }}%" />
+				{% endfor %}
+			</colgroup>
+
+			<thead>
+				<tr>
+					{% for col in grid.columns %}
+					<th{% if col.order is not null %} class="info"{% endif %}>
+						{{ col.title }}
+
+						{% if col.orderable %}
+							{{ _self.order(col) }}
+						{% endif %}
+					</th>
+					{% endfor %}
+				</tr>
+
+				{% if grid.schema.hasSearchable() %}
+				<tr>
+					{% for col in grid.columns %}
+					<th{% if col.search is not null %} class="warning"{% endif %}>
+						{% if col.searchable %}
+							{{ _self.search(col) }}
+						{% endif %}
+					</th>
+					{% endfor %}
+				</tr>
+				{% endif %}
+			</thead>
+
+			<tbody>
+				{% for row in grid.rows %}
+				<tr>
+					{% for cell in row %}
+					<td>{{ cell.content }}</td>
+					{% endfor %}
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+			
+	<div class="panel-body">
+		<nav>
+			<ul class="pagination" style="margin: 0;">
+				<li><a href="#"><span class="glyphicon glyphicon-chevron-left"></span></a></li>
+				<li><a href="#">1</a></li>
+				<li><a href="#">2</a></li>
+				<li><a href="#">3</a></li>
+				<li><a href="#">4</a></li>
+				<li><a href="#"><span class="glyphicon glyphicon-chevron-right"></span></a></li>
+			</ul>
+			
+			<div class="btn-group pull-right">
+				<button class="btn btn-default dropdown-toggle" data-toggle="dropdown">10 per page <span class="caret"></span></button>
+
+				<ul class="dropdown-menu">
+					<li><a href="#">Action</a></li>
+					<li><a href="#">Another action</a></li>
+				</ul>
+			</div>
+		</nav>
+	</div>
+</div>
+
+{% macro order(col) %}
+	{% set order = col.getOrder() %}
+
+	{% if order is null %}
+		<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order.replace({{ col.name }}:desc)">
+			<span class="glyphicon glyphicon-triangle-bottom text-muted"></span>
+		</button>
+	{% elseif order == 'desc' %}
+		<div class="btn-group">
+			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order.replace({{ col.name }}:asc)">
+				<span class="glyphicon glyphicon-triangle-bottom"></span>
+			</button>
+				
+			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order.remove({{ col.name }}:*)">
+				<span class="glyphicon glyphicon-remove text-muted"></span>
+			</button>
+		</div>
+	{% elseif order == 'asc' %}
+		<div class="btn-group">
+			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order.replace({{ col.name }}:desc)">
+				<span class="glyphicon glyphicon-triangle-top"></span>
+			</button>
+			
+			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order.remove({{ col.name }}:*)">
+				<span class="glyphicon glyphicon-remove text-muted"></span>
+			</button>
+		</div>
+	{% endif %}
+	
+	{% if order is not null %}
+		
+	{% endif %}
+{% endmacro %}
+
+{% macro search(col) %}
+	<div class="input-group input-group-sm" style="max-width: 200px;">
+		<input id="zgrid_search_{{ col.name}}" type="search" class="form-control" placeholder="Search by {{ col.title }}" value="{{ col.search }}" />
+
+		<span class="input-group-btn">
+			<button class="btn btn-default js-zgrid-param" data-definition="search.set({{ col.name }}:[#zgrid_search_{{ col.name}}])">
+				<span class="glyphicon glyphicon-search"></span>
+			</button>
+
+			{% if col.search is not null %}
+			<button class="btn btn-default js-zgrid-param" data-definition="search.remove({{ col.name }}:*)">
+				<span class="glyphicon glyphicon-remove"></span>
+			</button>
+			{% endif %}
+		</span>
+	</div>
+{% endmacro %}
