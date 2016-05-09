@@ -1,0 +1,116 @@
+<div class="row">
+	<div class="col-md-6">
+		{% if grid.globallySearchable %}
+		<div class="input-group">
+			<input id="zgrid_global_search" type="search" class="form-control" placeholder="Search" value="{{ grid.globalSearch }}" />
+
+			<span class="input-group-btn">
+				<button class="btn btn-default js-zgrid-param" data-definition="globalSearch.replace(query:[#zgrid_global_search])">
+					<i class="fa fa-search"></i>
+				</button>
+
+				{% if grid.globalSearch is not null %}
+				<button class="btn btn-default js-zgrid-param" data-definition="globalSearch.remove(query:*)">
+					<i class="fa fa-remove"></i>
+				</button>
+				{% endif %}
+			</span>
+		</div>
+		<br/>
+		{% endif %}
+	</div>
+</div>
+
+<table class="table table-bordered table-hover">
+	<colgroup>
+		{% for col in grid.columns %}
+		<col width="{{ col.width }}%" />
+		{% endfor %}
+	</colgroup>
+
+	<thead>
+		{% for col in grid.columns %}
+		<th{% if col.order is not null %} class="info"{% endif %}>
+			{{ col.title }}
+
+			{% if col.orderable %}
+				{{ _self.order(col) }}
+			{% endif %}
+		</th>
+		{% endfor %}
+		
+		{% if grid.schema.hasSearchable() %}
+		<tr>
+			{% for col in grid.columns %}
+			<th{% if col.search is not null %} class="warning"{% endif %}>
+				{% if col.searchable %}
+					{{ _self.search(col) }}
+				{% endif %}
+			</th>
+			{% endfor %}
+		</tr>
+		{% endif %}
+	</thead>
+
+	<tbody>
+		{% for row in grid %}
+		<tr>
+			{% for cell in row %}
+			<td>{{ cell.content }}</td>
+			{% endfor %}
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% macro order(col) %}
+	{% set order = col.getOrder() %}
+
+	{% if order is null %}
+		<button class="btn btn-link btn-xs js-zgrid-param pull-right" data-definition="order.replace({{ col.name }}:desc)">
+			<i class="fa fa-sort text-muted"></i>
+		</button>
+	{% elseif order == 'desc' %}
+		<div class="btn-group pull-right">
+			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order.replace({{ col.name }}:asc)">
+				<i class="fa fa-caret-up"></i>
+			</button>
+				
+			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order.remove({{ col.name }}:*)">
+				<i class="fa fa-remove text-muted"></i>
+			</button>
+		</div>
+	{% elseif order == 'asc' %}
+		<div class="btn-group pull-right">
+			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order.replace({{ col.name }}:desc)">
+				<i class="fa fa-caret-down"></i>
+			</button>
+			
+			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order.remove({{ col.name }}:*)">
+				<i class="fa fa-remove text-muted"></i>
+			</button>
+		</div>
+	{% endif %}
+	
+	{% if order is not null %}
+		
+	{% endif %}
+{% endmacro %}
+
+{% macro search(col) %}
+	<div class="input-group input-group-sm" style="max-width: 220px;">
+		<input id="zgrid_search_{{ col.name}}" type="search" class="form-control" placeholder="Search by {{ col.title }}" value="{{ col.search }}" />
+
+		<span class="input-group-btn">
+			<button class="btn btn-default js-zgrid-param" data-definition="search.set({{ col.name }}:[#zgrid_search_{{ col.name}}])">
+				<i class="fa fa-search"></i>
+			</button>
+
+			{% if col.search is not null %}
+			<button class="btn btn-default js-zgrid-param" data-definition="search.remove({{ col.name }}:*)">
+				<i class="fa fa-remove"></i>
+			</button>
+			{% endif %}
+		</span>
+	</div>
+{% endmacro %}
