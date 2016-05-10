@@ -58,9 +58,11 @@ class SelectableDataProvider implements DataProviderInterface
 	 */
 	public function getData(RequestInterface $request)
 	{
+		$offset = $request->getLimit() * ($request->getPage() - 1);
+		
 		$criteria = new Criteria();
 		$criteria->setMaxResults($request->getLimit());
-		$criteria->setFirstResult($request->getOffset());
+		$criteria->setFirstResult($offset);
 
 		$this->processOrder($criteria, $request);
 		$this->processSearch($criteria, $request);
@@ -86,6 +88,20 @@ class SelectableDataProvider implements DataProviderInterface
 		}
 
 		return $processed;
+	}
+	
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getTotal(RequestInterface $request)
+	{
+		$criteria = new Criteria();
+		
+		$this->processOrder($criteria, $request);
+		$this->processSearch($criteria, $request);
+		$this->processGlobalSearch($criteria, $request);
+		
+		return $this->collection->matching($criteria)->count();
 	}
 
 	/**

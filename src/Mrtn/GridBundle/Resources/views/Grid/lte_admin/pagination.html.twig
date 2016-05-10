@@ -1,0 +1,65 @@
+{% if grid.pagination.total > 1 %}
+<ul class="pagination">
+	{% if grid.pagination.first is null %}
+		<li class="disabled">
+			<a href="#">
+				<i class="fa fa-angle-double-left"></i>
+			</a>
+		</li>
+	{% else %}
+		<li>
+			<a href="#" class="js-zgrid-param" data-definition="page.set({{ grid.pagination.first }})">
+				<i class="fa fa-angle-double-left"></i>
+			</a>
+		</li>
+	{% endif %}
+	
+	{% if grid.pagination.previous is null %}
+		<li class="disabled">
+			<a href="#">
+				&nbsp;<i class="fa fa-angle-left"></i>&nbsp;
+			</a>
+		</li>
+	{% else %}
+		<li>
+			<a href="#" class="js-zgrid-param" data-definition="page.set({{ grid.pagination.previous }})">
+				&nbsp;<i class="fa fa-angle-left"></i>&nbsp;
+			</a>
+		</li>
+	{% endif %}
+		
+	{% for page in grid.pagination %}
+		<li {%- if grid.pagination.current == page %} class="active" {%- endif %}>
+			<a href="#" class="js-zgrid-param" data-definition="page.set({{ page }})">{{ page }}</a>
+		</li>
+	{% endfor %}
+	
+	{% if grid.pagination.next is null %}
+		<li class="disabled">
+			<a href="#">
+				&nbsp;<i class="fa fa-angle-right"></i>&nbsp;
+			</a>
+		</li>
+	{% else %}
+		<li>
+			<a href="#" class="js-zgrid-param" data-definition="page.set({{ grid.pagination.next }})">
+				&nbsp;<i class="fa fa-angle-right"></i>&nbsp;
+			</a>
+		</li>
+	{% endif %}
+	
+	{% if grid.pagination.last is null %}
+		<li class="disabled">
+			<a href="#">
+				<i class="fa fa-angle-double-right"></i>
+			</a>
+		</li>
+	{% else %}
+		<li>
+			<a href="#" class="js-zgrid-param" data-definition="page.set({{ grid.pagination.last }})">
+				<i class="fa fa-angle-double-right"></i>
+			</a>
+		</li>
+	{% endif %}
+</ul>
+{% endif %}

@@ -30,13 +30,6 @@ class HttpRequest implements RequestInterface
 	private $search;
 
 	/**
-	 * Resolved global search
-	 *
-	 * @var array
-	 */
-	private $globalSearch;
-
-	/**
 	 * Constructor
 	 * 
 	 * @param HttpFoundationRequest $request
@@ -57,9 +50,9 @@ class HttpRequest implements RequestInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getOffset()
+	public function getPage()
 	{
-		return $this->request->get('offset', self::DEFAULT_OFFSET);
+		return $this->request->get('page', self::DEFAULT_PAGE);
 	}
 
 	/**
@@ -68,9 +61,9 @@ class HttpRequest implements RequestInterface
 	public function getOrder()
 	{
 		if ($this->order === null) {
-			$this->order = array_map('strtolower', $this->fetchDefinition('order'));
+			$this->order = array_map('strtolower', $this->request->get('order', []));
 		}
-
+		
 		return $this->order;
 	}
 
@@ -92,7 +85,7 @@ class HttpRequest implements RequestInterface
 	public function getSearch()
 	{
 		if ($this->search === null) {
-			$this->search = $this->fetchDefinition('search');
+			$this->search = $this->request->get('search', []);
 		}
 
 		return $this->search;
@@ -115,46 +108,6 @@ class HttpRequest implements RequestInterface
 	 */
 	public function getGlobalSearch()
 	{
-		if ($this->globalSearch === null) {
-			$this->globalSearch = $this->fetchDefinition('globalSearch');
-		}
-
-		if (isset($this->globalSearch['query'])) {
-			return $this->globalSearch['query'];
-		}
-	}
-
-	/**
-	 * Fetch definition from request by name
-	 * 
-	 * Source:
-	 * "key1:value1, key2:value2"
-	 * 
-	 * Result:
-	 * [
-	 *     key1 => value1,
-	 *     key2 => value2
-	 * ]
-	 * 
-	 * @param  string $name
-	 * @return array
-	 */
-	protected function fetchDefinition($name)
-	{
-		$source = $this->request->get($name);
-
-		if (empty($source)) {
-			return [];
-		}
-
-		$definition = [];
-
-		foreach (explode(',', $source) as $element) {
-			list ($key, $value) = explode(':', $element);
-
-			$definition[trim($key)] = trim($value);
-		}
-
-		return $definition;
+		return $this->request->get('globalSearch');
 	}
 }

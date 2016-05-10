@@ -33,27 +33,39 @@
 	 */
 	var parseDefinition = function(src)
 	{
-		var matches = src.match(/^([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]+)\(([a-zA-Z0-9_]+):([^\)]+)\)$/);
+		// parameter.action(args)
+		var matches = src.match(/^([a-zA-Z0-9_\[\]]+)\.([a-zA-Z0-9_]+)\((.*)\)$/);
 
 		if (matches === null) {
 			throw 'Invalid definition: "' + src + '"';
 		}
-
+		
+		// Detect array: parameter[offset]
+		var arrayMatches = matches[1].match(/^([a-zA-Z0-9_]+)\[([a-zA-Z0-9_]+)\]$/);
+		
+		if (arrayMatches === null) {
+			return {
+				param:  matches[1],
+				action: matches[2],
+				args:   matches[3]
+			};
+		}
+		
 		return {
-			param:  matches[1],
+			param:  arrayMatches[1],
+			offset: arrayMatches[2],
 			action: matches[2],
-			field:  matches[3],
-			value:  matches[4]
+			args:   matches[3]
 		};
 	};
-
+	
 	/**
-	 * Process value
+	 * Process reference
 	 * 
 	 * @param   {String} value
 	 * @returns {String}
 	 */
-	var processValue = function(value)
+	var processReference = function(value)
 	{
 		var matches = value.match(/^\[(.+?)\]$/);
 
@@ -63,7 +75,7 @@
 
 		return $(matches[1]).val();
 	};
-
+	
 	/**
 	 * Assemble request string from parameters set
 	 * 
@@ -74,15 +86,20 @@
 	{
 		var paramsList = [];
 
-		for (var paramKey in params) {
-			var param = params[paramKey];
-			var fieldList = [];
-
-			for (var fieldKey in param) {
-				fieldList.push(fieldKey + ':' + param[fieldKey]);
+		for (var key in params) {
+			var param = params[key];
+			
+			if (typeof param === 'object') {
+				for (var property in param) {
+					var value = param[property];
+					
+					paramsList.push(key + '[' + property + ']=' + value);
+				}
+				
+				continue;
 			}
-
-			paramsList.push(paramKey + '=' + fieldList.join(','));
+			
+			paramsList.push(key + '=' + param);
 		}
 
 		return paramsList.join('&');
@@ -98,6 +115,10 @@
 	{
 		// Replace parameter by value
 		if (action.action === 'replace') {
+			if (typeof action.offset === 'undefined') {
+				throw '"replace()" can work only with arrays'
+			}
+			
 			if (multiple) {
 				if (typeof params[action.param] === 'undefined') {
 					params[action.param] = {};
@@ -106,27 +127,32 @@
 				params[action.param] = {};
 			}
 
-			params[action.param][action.field] = action.value;
+			params[action.param][action.offset] = processReference(action.args);
 			return;
 		}
 
 		// Add value to parameter
 		if (action.action === 'set') {
+			if (typeof action.offset === 'undefined') {
+				params[action.param] = processReference(action.args);
+				return;
+			}
+			
 			if (typeof params[action.param] === 'undefined') {
 				params[action.param] = {};
 			}
-
-			params[action.param][action.field] = action.value;
-			return;
+			
+			params[action.param][action.offset] = processReference(action.args);
 		}
 
 		// Remove value from parameter
 		if (action.action === 'remove') {
-			if (typeof params[action.param] === 'undefined') {
+			if (typeof action.offset === 'undefined') {
+				delete params[action.param];
 				return;
 			}
-
-			delete params[action.param][action.field];
+			
+			delete params[action.param][action.offset];
 
 			if ($.isEmptyObject(params[action.param])) {
 				delete params[action.param];
@@ -150,19 +176,15 @@
 		/**
 		 * Handle parameter's action
 		 */
-		this.parametersHandler = function()
+		this.parametersHandler = function(event)
 		{
+			event.preventDefault();
+			
 			var definition = $(this).attr('data-definition');
 			var action     = parseDefinition(definition);
 
-			action.value = processValue(action.value);
-
-			if (action.value === '') {
-				return;
-			}
-
 			processAction(self.dataParams, action);
-
+			
 			$.ajax({
 				url: self.dataUrl + '?' + assembleRequest(self.dataParams),
 				success: function(response) {

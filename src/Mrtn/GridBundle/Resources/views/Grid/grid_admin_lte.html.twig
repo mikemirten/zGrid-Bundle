@@ -5,12 +5,12 @@
 			<input id="zgrid_global_search" type="search" class="form-control" placeholder="Search" value="{{ grid.globalSearch }}" />
 
 			<span class="input-group-btn">
-				<button class="btn btn-default js-zgrid-param" data-definition="globalSearch.replace(query:[#zgrid_global_search])">
+				<button class="btn btn-default js-zgrid-param" data-definition="globalSearch.set([#zgrid_global_search])">
 					<i class="fa fa-search"></i>
 				</button>
 
 				{% if grid.globalSearch is not null %}
-				<button class="btn btn-default js-zgrid-param" data-definition="globalSearch.remove(query:*)">
+				<button class="btn btn-default js-zgrid-param" data-definition="globalSearch.remove()">
 					<i class="fa fa-remove"></i>
 				</button>
 				{% endif %}
@@ -63,30 +63,32 @@
 	</tbody>
 </table>
 
+{% include 'MrtnGridBundle:Grid:lte_admin/pagination.html.twig' %}
+		
 {% macro order(col) %}
 	{% set order = col.getOrder() %}
 
 	{% if order is null %}
-		<button class="btn btn-link btn-xs js-zgrid-param pull-right" data-definition="order.replace({{ col.name }}:desc)">
+		<button class="btn btn-link btn-xs js-zgrid-param pull-right" data-definition="order[{{ col.name }}].replace(desc)">
 			<i class="fa fa-sort text-muted"></i>
 		</button>
 	{% elseif order == 'desc' %}
 		<div class="btn-group pull-right">
-			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order.replace({{ col.name }}:asc)">
+			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order[{{ col.name }}].replace(asc)">
 				<i class="fa fa-caret-up"></i>
 			</button>
 				
-			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order.remove({{ col.name }}:*)">
+			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order[{{ col.name }}].remove()">
 				<i class="fa fa-remove text-muted"></i>
 			</button>
 		</div>
 	{% elseif order == 'asc' %}
 		<div class="btn-group pull-right">
-			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order.replace({{ col.name }}:desc)">
+			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order[{{ col.name }}].replace(desc)">
 				<i class="fa fa-caret-down"></i>
 			</button>
 			
-			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order.remove({{ col.name }}:*)">
+			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order[{{ col.name }}].remove()">
 				<i class="fa fa-remove text-muted"></i>
 			</button>
 		</div>
@@ -102,12 +104,12 @@
 		<input id="zgrid_search_{{ col.name}}" type="search" class="form-control" placeholder="Search by {{ col.title }}" value="{{ col.search }}" />
 
 		<span class="input-group-btn">
-			<button class="btn btn-default js-zgrid-param" data-definition="search.set({{ col.name }}:[#zgrid_search_{{ col.name}}])">
+			<button class="btn btn-default js-zgrid-param" data-definition="search[{{ col.name }}].set([#zgrid_search_{{ col.name }}])">
 				<i class="fa fa-search"></i>
 			</button>
 
 			{% if col.search is not null %}
-			<button class="btn btn-default js-zgrid-param" data-definition="search.remove({{ col.name }}:*)">
+			<button class="btn btn-default js-zgrid-param" data-definition="search[{{ col.name }}].remove()">
 				<i class="fa fa-remove"></i>
 			</button>
 			{% endif %}
