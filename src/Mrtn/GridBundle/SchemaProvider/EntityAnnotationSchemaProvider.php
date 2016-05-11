@@ -64,6 +64,7 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 			$this->schema = new Schema();
 
 			$this->processFields();
+			$this->processVirtualFields();
 		}
 
 		return $this->schema;
@@ -84,6 +85,36 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 		$this->addFieldsByIncludeStrategy();
 	}
 
+	/**
+	 * Add virtual fields provided by methods
+	 * Independent of strategy
+	 */
+	protected function processVirtualFields()
+	{
+		$methods = $this->getClassReflection()->getMethods();
+		
+		foreach ($methods as $method) {
+			if ($method->isStatic() || ! $method->isPublic()) {
+				continue;
+			}
+			
+			if (! preg_match('~^(?:is|get)([a-z0-9_]+)~i', $method->getName(), $matches)) {
+				continue;
+			}
+			
+			$annotation = $this->reader->getMethodAnnotation($method, ColumnAnnotation::class);
+			
+			if ($annotation === null) {
+				continue;
+			}
+			
+			$field = new Field($matches[1]);
+			$this->applyAnnotation($field, $annotation);
+
+			$this->schema->addField($field);
+		}
+	}
+	
 	/**
 	 * Add fields by properties with "Field" annotation
 	 * "Exclude" annotation will be ignored
@@ -118,6 +149,10 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 		$columnsAnnotations  = $this->getColumnAnnotations();
 
 		foreach ($properties as $property) {
+			if ($property->isStatic()) {
+				continue;
+			}
+			
 			$name = $property->getName();
 
 			if (isset($excludedAnnotations[$name])) {
@@ -203,7 +238,7 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 
 		return $annotations;
 	}
-
+	
 	/**
 	 * Get reflection of entity class
 	 * 
