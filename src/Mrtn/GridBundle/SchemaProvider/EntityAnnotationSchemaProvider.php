@@ -108,7 +108,7 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 				continue;
 			}
 			
-			$field = new Field($matches[1]);
+			$field = new Field(lcfirst($matches[1]));
 			$this->applyAnnotation($field, $annotation);
 
 			$this->schema->addField($field);
