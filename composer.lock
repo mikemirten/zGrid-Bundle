@@ -1,0 +1,63 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "b95e80426dc6a83c9a656236e2683497",
+    "content-hash": "d3620fc321dca988cc1ebb1aeb641983",
+    "packages": [
+        {
+            "name": "mikemirten/zgrid",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mikemirten/zGrid.git",
+                "reference": "43fea52d9f6190f158cd5a388fe1c568c0a3fdd8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mikemirten/zGrid/zipball/43fea52d9f6190f158cd5a388fe1c568c0a3fdd8",
+                "reference": "43fea52d9f6190f158cd5a388fe1c568c0a3fdd8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Zgrid\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Mikemirten",
+                    "email": "mikemirten@gmail.com"
+                }
+            ],
+            "description": "zGRID core library",
+            "keywords": [
+                "grid",
+                "library"
+            ],
+            "time": "2016-05-12 19:09:08"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "mikemirten/zgrid": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=5.4"
+    },
+    "platform-dev": []
+}
