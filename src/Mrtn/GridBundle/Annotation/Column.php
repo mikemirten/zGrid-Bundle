@@ -38,11 +38,25 @@ class Column
 	public $orderable = false;
 
 	/**
+	 * Order by properties
+	 *
+	 * @var array
+	 */
+	public $orderBy = [];
+	
+	/**
 	 * Searchable
 	 *
 	 * @var boolean
 	 */
 	public $searchable = false;
+	
+	/**
+	 * Search by properties
+	 *
+	 * @var array
+	 */
+	public $searchBy = [];
 
 	/**
 	 * Involved in global search

@@ -181,7 +181,9 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 		$field->setWidth($annotation->width);
 		$field->setProperty($annotation->property);
 		$field->setOrderable($annotation->orderable);
+		$field->setOrderBy($annotation->orderBy);
 		$field->setSearchable($annotation->searchable);
+		$field->setSearchBy($annotation->searchBy);
 		$field->setGloballySearchable($annotation->globalSearch);
 	}
 

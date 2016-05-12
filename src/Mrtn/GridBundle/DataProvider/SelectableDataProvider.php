@@ -9,6 +9,7 @@ use Zgrid\SchemaProvider\SchemaProviderInterface;
 use Zgrid\Request\RequestInterface;
 use Zgrid\DataProvider\DataProviderInterface;
 use Zgrid\DataProcessor\DataProcessorInterface;
+use Zgrid\Logic\LogicInterface;
 
 class SelectableDataProvider implements DataProviderInterface
 {
@@ -124,6 +125,19 @@ class SelectableDataProvider implements DataProviderInterface
 	protected function processSearch(Criteria $criteria, RequestInterface $request)
 	{
 		foreach ($request->getSearch() as $field => $value) {
+			if (is_array($value)) {
+				$parts = [];
+				
+				foreach ($value as $subfield => $subvalue) {
+					$parts[] = Criteria::expr()->contains($subfield, $subvalue);
+				}
+				
+				$expr = call_user_func_array([Criteria::expr(), 'OrX'], $parts);
+				
+				$criteria->andWhere($expr);
+				return;
+			}
+			
 			$criteria->andWhere(Criteria::expr()->contains($field, $value));
 		}
 	}
