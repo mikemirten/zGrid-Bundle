@@ -29,9 +29,15 @@
 	{% endif %}
 		
 	{% for page in grid.pagination %}
-		<li {%- if grid.pagination.current == page %} class="active" {%- endif %}>
+		{%- if grid.pagination.current == page %}
+		<li class="active">
+			<a href="#">{{ page }}</a>
+		</li>
+		{% else %}
+		<li>
 			<a href="#" class="js-zgrid-param" data-definition="page.set({{ page }})">{{ page }}</a>
 		</li>
+		{%- endif %}
 	{% endfor %}
 	
 	{% if grid.pagination.next is null %}
