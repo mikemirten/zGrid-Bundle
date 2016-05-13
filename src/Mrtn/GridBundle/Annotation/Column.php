@@ -71,4 +71,11 @@ class Column
 	 * @var boolean
 	 */
 	public $globalSearch = false;
+	
+	/**
+	 * Priority
+	 *
+	 * @var int
+	 */
+	public $priority;
 }

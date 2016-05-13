@@ -206,6 +206,7 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 		$field->setSearchable($annotation->searchable);
 		$field->setSearchBy($annotation->searchBy);
 		$field->setGloballySearchable($annotation->globalSearch);
+		$field->setPriority($annotation->priority);
 	}
 	
 	/**
