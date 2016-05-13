@@ -17,6 +17,13 @@ class Column
 	public $title;
 
 	/**
+	 * Type
+	 *
+	 * @var string
+	 */
+	public $type;
+	
+	/**
 	 * Width
 	 *
 	 * @var int

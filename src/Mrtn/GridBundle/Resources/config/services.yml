@@ -7,3 +7,4 @@ services:
         arguments:
             - @annotation_reader
             - @property_accessor
+            - @doctrine

@@ -3,7 +3,9 @@
 namespace Mrtn\GridBundle\SchemaProvider;
 
 use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Annotations\Reader;
+
 
 use Mrtn\GridBundle\Annotation\Grid    as GridAnnotation;
 use Mrtn\GridBundle\Annotation\Column  as ColumnAnnotation;
@@ -29,6 +31,13 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 	 * @var Reader
 	 */
 	private $reader;
+	
+	/**
+	 * Doctrine registry
+	 *
+	 * @var ManagerRegistry
+	 */
+	private $registry;
 
 	/**
 	 * Reflection
@@ -43,16 +52,24 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 	 * @var Schema
 	 */
 	private $schema;
+	
+	/**
+	 * Entity metadata
+	 * 
+	 * @var \Doctrine\ORM\Mapping\ClassMetadata
+	 */
+	private $metadata;
 
 	/**
 	 * Constructor
 	 * 
 	 * @param RepositoryInterface $repository
 	 */
-	public function __construct(ObjectRepository $repository, Reader $reader)
+	public function __construct(ObjectRepository $repository, Reader $reader, ManagerRegistry $registry)
 	{
 		$this->repository = $repository;
 		$this->reader     = $reader;
+		$this->registry   = $registry;
 	}
 
 	/**
@@ -66,7 +83,7 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 			$this->processFields();
 			$this->processVirtualFields();
 		}
-
+		
 		return $this->schema;
 	}
 
@@ -133,7 +150,8 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 
 			$field = new Field($name);
 			$this->applyAnnotation($field, $annotations[$name]);
-
+			$this->resolveType($field);
+			
 			$this->schema->addField($field);
 		}
 	}
@@ -164,7 +182,9 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 			if (isset($columnsAnnotations[$name])) {
 				$this->applyAnnotation($field, $columnsAnnotations[$name]);
 			}
-
+			
+			$this->resolveType($field);
+			
 			$this->schema->addField($field);
 		}
 	}
@@ -178,6 +198,7 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 	protected function applyAnnotation(Field $field, ColumnAnnotation $annotation)
 	{
 		$field->setTitle($annotation->title);
+		$field->setType($annotation->type);
 		$field->setWidth($annotation->width);
 		$field->setProperty($annotation->property);
 		$field->setOrderable($annotation->orderable);
@@ -185,6 +206,41 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 		$field->setSearchable($annotation->searchable);
 		$field->setSearchBy($annotation->searchBy);
 		$field->setGloballySearchable($annotation->globalSearch);
+	}
+	
+	/**
+	 * Resolve type of field
+	 * 
+	 * @param  Field $field
+	 */
+	protected function resolveType(Field $field)
+	{
+		if ($field->getType() !== null) {
+			return;
+		}
+		
+		$type = $this->getMetadata()
+			->getTypeOfField($field->getName());
+		
+		$field->setType($type);
+	}
+	
+	/**
+	 * Get entity metadata
+	 * 
+	 * @return \Doctrine\ORM\Mapping\ClassMetadata
+	 */
+	protected function getMetadata()
+	{
+		if ($this->metadata === null) {
+			$class = $this->repository->getClassName();
+			
+			$this->metadata = $this->registry
+				->getManagerForClass($class)
+				->getClassMetadata($class);
+		}
+		
+		return $this->metadata;
 	}
 
 	/**

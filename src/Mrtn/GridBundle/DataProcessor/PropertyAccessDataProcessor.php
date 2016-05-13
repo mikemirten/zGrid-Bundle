@@ -29,9 +29,9 @@ class PropertyAccessDataProcessor implements DataProcessorInterface
 	/**
 	 * Properties list
 	 *
-	 * @var array
+	 * @var \Zgrid\Schema\Field[]
 	 */
-	private $propertiesList;
+	private $fields;
 
 	/**
 	 * Constructor
@@ -50,34 +50,36 @@ class PropertyAccessDataProcessor implements DataProcessorInterface
 	 */
 	public function process($source)
 	{
-		$this->initializeProperties();
+		$fields = $this->getFields();
 
 		$row = new Row();
 
-		foreach ($this->propertiesList as $property) {
+		foreach ($fields as $property => $field) {
 			$value = $this->accessor->getValue($source, $property);
 
-			$row->appendCell(new Cell($value));
+			$row->appendCell(new Cell($value, $field));
 		}
 
 		return $row;
 	}
 
 	/**
-	 * Initialize properties
+	 * Get properties
+	 * 
+	 * @return \Zgrid\Schema\Field[]
 	 */
-	protected function initializeProperties()
+	protected function getFields()
 	{
-		if ($this->propertiesList !== null) {
-			return;
+		if ($this->fields === null) {
+			$this->fields = [];
+
+			foreach ($this->schemaProvider->getSchema()->getFields() as $field) {
+				$property = $field->getProperty() ?: $field->getName();
+
+				$this->fields[$property] = $field;
+			}
 		}
-
-		$this->propertiesList = new \SplDoublyLinkedList();
-
-		foreach ($this->schemaProvider->getSchema()->getFields() as $field) {
-			$property = $field->getProperty() ?: $field->getName();
-
-			$this->propertiesList->push($property);
-		}
+		
+		return $this->fields;
 	}
 }

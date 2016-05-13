@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request as HttpFoundationRequest;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Collections\Selectable;
 use Doctrine\Common\Annotations\Reader;
 
@@ -35,15 +36,23 @@ class Builder
 	protected $propertyAccess;
 	
 	/**
+	 * Doctrine registry
+	 *
+	 * @var ManagerRegistry
+	 */
+	private $registry;
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param Reader                    $annotationReader
 	 * @param PropertyAccessorInterface $propertyAccess
 	 */
-	public function __construct(Reader $annotationReader, PropertyAccessorInterface $propertyAccess)
+	public function __construct(Reader $annotationReader, PropertyAccessorInterface $propertyAccess, ManagerRegistry $registry)
 	{
 		$this->annotationReader = $annotationReader;
 		$this->propertyAccess   = $propertyAccess;
+		$this->registry         = $registry;
 	}
 	
 	/**
@@ -56,7 +65,7 @@ class Builder
 	public function createBySelectable(Selectable $selectable, HttpFoundationRequest $httpRequest = null, SchemaProviderInterface $schemaProvider = null)
 	{
 		if ($schemaProvider === null && $selectable instanceof ObjectRepository) {
-			$schemaProvider = new EntityAnnotationSchemaProvider($selectable, $this->annotationReader);
+			$schemaProvider = new EntityAnnotationSchemaProvider($selectable, $this->annotationReader, $this->registry);
 		}
 		
 		if ($schemaProvider === null) {
