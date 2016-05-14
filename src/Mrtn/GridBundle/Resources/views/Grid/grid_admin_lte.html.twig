@@ -68,11 +68,15 @@
 {% macro cell(cell) %}
 	{% set type = cell.type %}
 		
+	{% if cell.hasLink() %}<a href="{{ cell.link }}">{% endif %}
+	
 	{% if type == 'datetime' %}
 		{{ cell.content | date('m/d/Y H:ia') }}
 	{% else %}
 		{{ cell.content }}
 	{% endif %}
+	
+	{% if cell.hasLink() %}</a>{% endif %}
 {% endmacro %}
 
 {% macro order(col) %}

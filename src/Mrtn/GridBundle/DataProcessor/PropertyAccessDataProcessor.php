@@ -54,6 +54,12 @@ class PropertyAccessDataProcessor implements DataProcessorInterface
 
 		$row = new Row();
 
+		foreach ($this->schemaProvider->getSchema()->getMetadataProperties() as $name) {
+			$metaValue = $this->accessor->getValue($source, $name);
+			
+			$row->setMetadataProperty($name, $metaValue);
+		}
+		
 		foreach ($fields as $property => $field) {
 			$value = $this->accessor->getValue($source, $property);
 

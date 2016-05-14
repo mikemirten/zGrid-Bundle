@@ -7,9 +7,10 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Annotations\Reader;
 
 
-use Mrtn\GridBundle\Annotation\Grid    as GridAnnotation;
-use Mrtn\GridBundle\Annotation\Column  as ColumnAnnotation;
-use Mrtn\GridBundle\Annotation\Exclude as ExcludeAnnotation;
+use Mrtn\GridBundle\Annotation\Grid     as GridAnnotation;
+use Mrtn\GridBundle\Annotation\Column   as ColumnAnnotation;
+use Mrtn\GridBundle\Annotation\Exclude  as ExcludeAnnotation;
+use Mrtn\GridBundle\Annotation\Metadata as MetadataAnnotation;
 
 use Zgrid\Schema\Schema;
 use Zgrid\Schema\Field;
@@ -82,9 +83,22 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 
 			$this->processFields();
 			$this->processVirtualFields();
+			$this->processMetadataFields();
 		}
 		
 		return $this->schema;
+	}
+	
+	/**
+	 * Process metadata fields
+	 */
+	protected function processMetadataFields()
+	{
+		$annotations = $this->readPropertyAnnotations(MetadataAnnotation::class);
+		
+		foreach ($annotations as $property => $annotation) {
+			$this->schema->addMetadataProperty($annotation->name ?: $property);
+		}
 	}
 
 	/**
@@ -119,6 +133,12 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 				continue;
 			}
 			
+			$metaAnnotation = $this->reader->getMethodAnnotation($method, MetadataAnnotation::class);
+			
+			if ($metaAnnotation !== null) {
+				$this->schema->addMetadataProperty($metaAnnotation->name ?: lcfirst($matches[1]));
+			}
+			
 			$annotation = $this->reader->getMethodAnnotation($method, ColumnAnnotation::class);
 			
 			if ($annotation === null) {
@@ -139,7 +159,7 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 	protected function addFieldsByIncludeStrategy()
 	{
 		$properties  = $this->getClassReflection()->getProperties();
-		$annotations = $this->getColumnAnnotations();
+		$annotations = $this->readPropertyAnnotations(ColumnAnnotation::class);
 
 		foreach ($properties as $property) {
 			$name = $property->getName();
@@ -163,8 +183,8 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 	{
 		$properties = $this->getClassReflection()->getProperties();
 
-		$excludedAnnotations = $this->getExcludeAnnotations();
-		$columnsAnnotations  = $this->getColumnAnnotations();
+		$excludedAnnotations = $this->readPropertyAnnotations(ExcludeAnnotation::class);
+		$columnsAnnotations  = $this->readPropertyAnnotations(ColumnAnnotation::class);
 
 		foreach ($properties as $property) {
 			if ($property->isStatic()) {
@@ -254,26 +274,6 @@ class EntityAnnotationSchemaProvider implements SchemaProviderInterface
 		$reflection = $this->getClassReflection();
 
 		return $this->reader->getClassAnnotation($reflection, GridAnnotation::class);
-	}
-
-	/**
-	 * Get fields annotations
-	 * 
-	 * @return ExcludeAnnotation[]
-	 */
-	protected function getColumnAnnotations()
-	{
-		return $this->readPropertyAnnotations(ColumnAnnotation::class);
-	}
-
-	/**
-	 * Get exclude annotations
-	 * 
-	 * @return ExcludeAnnotation[]
-	 */
-	protected function getExcludeAnnotations()
-	{
-		return $this->readPropertyAnnotations(ExcludeAnnotation::class);
 	}
 
 	/**
