@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mikemirten/zGrid.git",
-                "reference": "c5ae72dd5826a01cf9538e6a435210f69d5944f7"
+                "reference": "37f20b965ba5c3b2f5a4777eeb03b1d6929a0c81"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mikemirten/zGrid/zipball/c5ae72dd5826a01cf9538e6a435210f69d5944f7",
-                "reference": "c5ae72dd5826a01cf9538e6a435210f69d5944f7",
+                "url": "https://api.github.com/repos/mikemirten/zGrid/zipball/37f20b965ba5c3b2f5a4777eeb03b1d6929a0c81",
+                "reference": "37f20b965ba5c3b2f5a4777eeb03b1d6929a0c81",
                 "shasum": ""
             },
             "require": {
@@ -45,7 +45,7 @@
                 "grid",
                 "library"
             ],
-            "time": "2016-05-14 03:57:40"
+            "time": "2016-05-14 04:50:12"
         }
     ],
     "packages-dev": [],
