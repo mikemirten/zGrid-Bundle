@@ -59,8 +59,8 @@ class Builder
 	 * Create GRID by selectable
 	 * 
 	 * @param Selectable              $selectable
-	 * @param SchemaProviderInterface $schemaProvider
 	 * @param HttpFoundationRequest   $httpRequest
+	 * @param SchemaProviderInterface $schemaProvider
 	 */
 	public function createBySelectable(Selectable $selectable, HttpFoundationRequest $httpRequest = null, SchemaProviderInterface $schemaProvider = null)
 	{
