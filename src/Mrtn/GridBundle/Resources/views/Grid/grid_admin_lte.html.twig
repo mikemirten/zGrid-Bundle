@@ -72,8 +72,12 @@
 	
 	{% if type == 'datetime' %}
 		{{ cell.content | date('m/d/Y H:ia') }}
+	{% elseif type == 'boolean' %}
+		{% if cell.content %}<i class="fa fa-check"></i>{% endif %}
+	{% elseif type == 'currency' %}
+		${{ cell.content | number_format(2, '.', ',') }}
 	{% else %}
-		{{ cell.content }}
+		{{ cell.content | raw }}
 	{% endif %}
 	
 	{% if cell.hasLink() %}</a>{% endif %}
@@ -89,7 +93,7 @@
 	{% elseif order == 'desc' %}
 		<div class="btn-group pull-right">
 			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order[{{ col.name }}].replace(asc)">
-				<i class="fa fa-caret-up"></i>
+				<i class="fa fa-caret-down"></i>
 			</button>
 				
 			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order[{{ col.name }}].remove()">
@@ -99,7 +103,7 @@
 	{% elseif order == 'asc' %}
 		<div class="btn-group pull-right">
 			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order[{{ col.name }}].replace(desc)">
-				<i class="fa fa-caret-down"></i>
+				<i class="fa fa-caret-up"></i>
 			</button>
 			
 			<button class="btn btn-link btn-xs js-zgrid-param" data-definition="order[{{ col.name }}].remove()">
