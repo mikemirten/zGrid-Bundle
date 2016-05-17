@@ -23,10 +23,20 @@
 	/**
 	 * Parse action's definition
 	 * 
-	 * {parameter}.{action}({field}:{args})
+	 * Parameter is a scalar:
+	 * {parameter}.{action}({args})
 	 * 
-	 * Example:
-	 * order.set(name:asc)
+	 * example:
+	 * page.set(1)
+	 * limit.remove()
+	 * 
+	 * Parameter is an array:
+	 * {parameter}[{arrayOffet}].{action}({args})
+	 * 
+	 * example:
+	 * order[firstName].set(asc)
+	 * search[description].remove()
+	 * 
 	 * 
 	 * @param   {String} src
 	 * @returns {Object}
@@ -93,13 +103,13 @@
 				for (var property in param) {
 					var value = param[property];
 					
-					paramsList.push(key + '[' + property + ']=' + value);
+					paramsList.push(encodeURI(key) + '[' + encodeURI(property) + ']=' + encodeURI(value));
 				}
 				
 				continue;
 			}
 			
-			paramsList.push(key + '=' + param);
+			paramsList.push(encodeURI(key) + '=' + encodeURI(param));
 		}
 
 		return paramsList.join('&');
@@ -174,6 +184,41 @@
 		var self = this;
 		
 		/**
+		 * Apply handling of control elements
+		 */
+		this.applyControl = function() 
+		{
+			this.container.find('.js-zgrid-param').click(this.parametersHandler);
+
+			if (typeof $.fn.daterangepicker !== 'undefined') {
+				this.container
+					.find('.js-zgrid-input-daterange')
+					.daterangepicker()
+					.on('apply.daterangepicker', function() {
+						var definition = $(this).attr('data-definition');
+						var action     = parseDefinition(definition);
+
+						processAction(self.dataParams, action);
+						self.refresh();
+					});
+			}
+		};
+		
+		/**
+		 * Refresh GRID
+		 */
+		this.refresh = function()
+		{
+			$.ajax({
+				url: self.dataUrl + '?' + assembleRequest(self.dataParams),
+				success: function(response) {
+					self.container.html(response);
+					self.applyControl();
+				}
+			});
+		}
+		
+		/**
 		 * Handle parameter's action
 		 */
 		this.parametersHandler = function(event)
@@ -184,17 +229,10 @@
 			var action     = parseDefinition(definition);
 
 			processAction(self.dataParams, action);
-			
-			$.ajax({
-				url: self.dataUrl + '?' + assembleRequest(self.dataParams),
-				success: function(response) {
-					self.container.html(response);
-					self.container.find('.js-zgrid-param').click(self.parametersHandler);
-				}
-			});
+			self.refresh();
 		};
 		
-		this.container.find('.js-zgrid-param').click(this.parametersHandler);
+		this.applyControl();
 	};
 
 	/**

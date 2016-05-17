@@ -9,7 +9,6 @@ use Zgrid\SchemaProvider\SchemaProviderInterface;
 use Zgrid\Request\RequestInterface;
 use Zgrid\DataProvider\DataProviderInterface;
 use Zgrid\DataProcessor\DataProcessorInterface;
-use Zgrid\Logic\LogicInterface;
 
 class SelectableDataProvider implements DataProviderInterface
 {
@@ -138,8 +137,46 @@ class SelectableDataProvider implements DataProviderInterface
 				return;
 			}
 			
+			$type = $this->getSchema()->getField($field)->getType();
+			
+			if ($type === 'datetime') {
+				$this->handleDatetime($criteria, $field, $value);
+				return;
+			}
+			
 			$criteria->andWhere(Criteria::expr()->contains($field, $value));
 		}
+	}
+	
+	/**
+	 * Handle datetime parameter
+	 * 
+	 * @param  Criteria $criteria
+	 * @param  string   $field
+	 * @param  string   $value
+	 */
+	protected function handleDatetime(Criteria $criteria, $field, $value)
+	{
+		$oneDayInterval = \DateInterval::createFromDateString('1 day');
+		
+		// Detect interval
+		if (preg_match('~^([0-9\-/\:]+)\s*\-\s*([0-9\-/\:]+)$~', $value, $matches)) {
+			$start = new \DateTime($matches[1]);
+			$criteria->andWhere(Criteria::expr()->gte($field, $start));
+
+			$end = new \DateTime($matches[2]);
+			$end->add($oneDayInterval);
+			$criteria->andWhere(Criteria::expr()->lt($field, $end));
+			
+			return;
+		}
+		
+		$start = new \DateTime($value);
+		$criteria->andWhere(Criteria::expr()->gte($field, $start));
+		
+		$end = new \DateTime($value);
+		$end->add($oneDayInterval);
+		$criteria->andWhere(Criteria::expr()->lt($field, $end));
 	}
 
 	/**

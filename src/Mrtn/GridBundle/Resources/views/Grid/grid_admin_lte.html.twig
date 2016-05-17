@@ -3,7 +3,7 @@
 		{% if grid.globallySearchable %}
 		<div class="input-group">
 			<input id="zgrid_global_search" type="search" class="form-control" placeholder="Search" value="{{ grid.globalSearch }}" />
-
+			
 			<span class="input-group-btn">
 				<button class="btn btn-default js-zgrid-param" data-definition="globalSearch.set([#zgrid_global_search])">
 					<i class="fa fa-search"></i>
@@ -118,8 +118,14 @@
 {% endmacro %}
 
 {% macro search(col) %}
+	{% set type = col.type %}
+	
 	<div class="input-group input-group-sm" style="max-width: 220px;">
-		<input id="zgrid_search_{{ col.name}}" type="search" class="form-control" placeholder="Search by {{ col.title }}" value="{{ col.search }}" />
+		{% if type == 'datetime' %}
+			<input id="zgrid_search_{{ col.name}}" type="datetime" class="form-control js-zgrid-input-daterange" placeholder="Search by {{ col.title }}" value="{{ col.search }}" data-definition="search[{{ col.name }}].set([#zgrid_search_{{ col.name }}])" />
+		{% else %}
+			<input id="zgrid_search_{{ col.name}}" type="search" class="form-control" placeholder="Search by {{ col.title }}" value="{{ col.search }}" />
+		{% endif %}
 
 		<span class="input-group-btn">
 			<button class="btn btn-default js-zgrid-param" data-definition="search[{{ col.name }}].set([#zgrid_search_{{ col.name }}])">
